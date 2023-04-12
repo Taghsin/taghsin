@@ -1,0 +1,205 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
+Globals:
+  Function:
+    Timeout: 15
+
+Resources:
+  taghsin:
+    Type: AWS::Serverless::Function 
+    Properties:
+      CodeUri: src/
+      Handler: index.lambda_handler
+      Runtime: python3.9
+      Layers:
+        - "arn:aws:lambda:us-east-1:xxx:layer:taghsin-layer:2"
+      FunctionName: taghsin
+      Environment:
+        Variables:
+          ENABLE_SLACK: "True"
+          SLACK_CHANNEL: !Ref SlackChannel
+          SLACK_WEBHOOK_URL: !Ref SlackWebhookUrl
+          ENABLE_TEAMS: "False"
+          TEAMS_CHANNEL: !Ref TeamsChannel
+          TEAMS_WEBHOOK_URL: !Ref TeamsWebhookUrl
+          IGNORED_USERS: !Ref IgonredUsers
+      Policies:
+      - Statement:
+        - Sid: CloudwatchParametersPolicy
+          Effect: Allow
+          Action:
+          - logs:CreateLogStream
+          - logs:CreateLogGroup
+          - logs:PutLogEvents
+          Resource: 'arn:aws:logs:*:*:*'
+        - Sid: CloudtrailParametersPolicy
+          Effect: Allow
+          Action:
+          - acm:AddTagsToCertificate
+          - acm:ListTagsForCertificate
+          - aps:ListTagsForResource
+          - aps:TagResource
+          - cloudfront:ListTagsForResource
+          - cloudfront:TagResource
+          - cloudwatch:ListTagsForResource
+          - cloudwatch:TagResource
+          - codeartifact:ListTagsForResource
+          - codeartifact:TagResource
+          - codecommit:ListTagsForResource
+          - codecommit:TagResource
+          - dms:AddTagsToResource
+          - dms:ListTagsForResource
+          - dynamodb:ListTagsOfResource 
+          - dynamodb:ListTagsOfResource
+          - dynamodb:TagResource
+          - ec2:CreateTags
+          - ec2:Describe*
+          - ecr:ListTagsForResource
+          - ecr:TagResource
+          - ecs:ListTagsForResource
+          - ecs:TagResource
+          - elasticfilesystem:ListTagsForResource
+          - elasticfilesystem:TagResource
+          - eks:ListTagsForResource
+          - eks:TagResource
+          - elasticloadbalancing:AddTags
+          - elasticloadbalancing:DescribeTags
+          - events:ListTagsForResource
+          - events:TagResource
+          - firehose:ListTagsForDeliveryStream
+          - firehose:TagDeliveryStream
+          - grafana:ListTagsForResource
+          - grafana:TagResource
+          - kms:ListResourceTags
+          - kms:TagResource
+          - kinesis:AddTagsToStream
+          - kinesis:ListTagsForStream
+          - iam:ListPolicyTags
+          - iam:ListRoleTags
+          - iam:ListUserTags
+          - iam:TagPolicy
+          - iam:TagRole
+          - iam:TagUser
+          - lambda:ListTags
+          - lambda:TagResource
+          - logs:CreateLogGroup
+          - logs:CreateLogStream
+          - logs:PutLogEvents
+          - redshift:DescribeTags
+          - redshift:CreateTags
+          - rds:AddTagsToResource
+          - rds:ListTagsForResource
+          - route53:ChangeTagsForResource
+          - route53:ListTagsForResource
+          - secretsmanager:DescribeSecret
+          - secretsmanager:TagResource
+          - s3:GetBucketTagging
+          - s3:PutBucketTagging
+          - sns:ListTagsForResource
+          - sns:TagResource
+          - ssm:AddTagsToResource
+          - ssm:GetParameters
+          - ssm:GetParameter
+          - ssm:ListTagsForResource
+          - sqs:ListQueueTags
+          - sqs:ListQueues
+          - sqs:TagQueue
+          - opsworks:ListTags
+          - opsworks:TagResource
+          Resource: '*'
+      Events:
+        CloudWatchEvent:
+          Type: CloudWatchEvent
+          Properties:
+            Pattern:
+              detail-type:
+                - AWS API Call via CloudTrail
+              detail:
+                eventName:
+                  - AllocateAddress
+                  - CreateBucket
+                  - CreateCluster
+                  - CreateDBClusterSnapshot
+                  - CreateDeliveryStream
+                  - CreateDBInstance
+                  - CreateDBParameterGroup
+                  - CreateDBSnapshot
+                  - CreateDBSubnetGroup
+                  - CreateDhcpOptions
+                  - CreateDistribution
+                  - CreateDomain
+                  - CreateEndpoint
+                  - CreateEventSubscription
+                  - CreateFileSystem
+                  - CreateFunction20150331
+                  - CreateHostedZone
+                  - CreateHealthCheck
+                  - CreateKey
+                  - CreateLoadBalancer
+                  - CreateImage
+                  - CreateInternetGateway
+                  - CreateMaintenanceWindow
+                  - CreateNatGateway
+                  - CreateNetworkAcl
+                  - CreateNetworkInterface
+                  - CreateOptionGroup
+                  - CreatePolicy
+                  - CreateReplicationInstance
+                  - CreateQueue
+                  - CreateReplicationGroup
+                  - CreateReplicationSubnetGroup
+                  - CreateRepository
+                  - CreateRole
+                  - CreateRouteTable
+                  - CreateProject
+                  - CreateSecurityGroup
+                  - CreateSecret
+                  - CreateService
+                  - CreateSnapshot
+                  - CreateSubnet
+                  - CreateStream
+                  - CreateTable
+                  - CreateTopic
+                  - CreateUser
+                  - CreateVolume
+                  - CreateVpc
+                  - CreateVpcPeeringConnection
+                  - CreateWorkspace
+                  - ImportCertificate
+                  - PutMetricAlarm
+                  - PutParameter
+                  - PutRule
+                  - RegisterTaskDefinition
+                  - RequestCertificate
+                  - RunInstances
+  SlackChannel:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: /taghsin/slack_channel
+      Type: String
+      Value: <value>
+  SlackWebhookUrl:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: /taghsin/slack_webhook_url
+      Type: String
+      Value: <value>
+  TeamsChannel:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: /taghsin/teams_channel
+      Type: String
+      Value: <value>
+  TeamsWebhookUrl:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: /taghsin/teams_webhook_url
+      Type: String
+      Value: <value>
+  IgonredUsers:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: /taghsin/ignored_users
+      Type: String
+      Value: "_terraform,_packer" #example
